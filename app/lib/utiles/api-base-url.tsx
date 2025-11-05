@@ -1,6 +1,6 @@
 // ادرس سرور بک اند
 const config = {
-  development: "http://localhost:2025",
+  development: "https://localhost:7005/api/",
   production: "",
   otherserver: "",
 };
