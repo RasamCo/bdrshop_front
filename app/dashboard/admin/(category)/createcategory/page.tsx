@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import {
   AddCategoryFormType,
   AddCategoryRequestSchema,
@@ -6,34 +6,74 @@ import {
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
+import CreateCategory from "@/app/lib/services/category/creatcategory";
+import { revalidateCategoris } from "@/app/lib/actions/revalidate-category";
+import { useRouter } from "next/navigation";
 
 function CategoryCreateForm() {
-
+  const router = useRouter();
   const {
     register,
     handleSubmit,
-    formState: { errors,isSubmitting  },
+    reset,
+    formState: { errors, isSubmitting },
   } = useForm<AddCategoryFormType>({
     resolver: zodResolver(AddCategoryRequestSchema),
   });
-  
 
-// تابع ارسال فرم
-  const onSubmit = async (data: AddCategoryFormType) => {
-    console.log("فرم ارسال شد:", data);
+  // const createMutation = useMutation({
+  //   mutationFn: (formData: AddCategoryFormType) => CreateCategory(formData),
+  //   onSuccess: async (data) => {
+  //     console.log(data);
 
-    // نمونه ارسال به API (می‌تونی URL خودت رو جایگزین کنی)
-    // await fetch("/api/categories", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(data),
-    // });
+  //     console.log("Created Category:", data);
+  //     await revalidateCategoris(); // بروزرسانی سمت سرور
+  //     reset(); // ریست فرم بعد از ساخت موفق
+  //     // toast.dark("  خانه جدید اضافه شد🎉", {
+  //     //   style: { background: "#1E1E1E", color: "#fff" },
+  //     // });
+  //     // setTimeout(() => {
+  //     //   //router.push("/");
+  //     // }, 3000);
+  //   },
+  //   onError: (err) => {
+  //     console.log("❌ خطا در ایجاد دسته بندی: " + err.message);
+  //   },
+  // });
+const createMutation = useMutation({
+  mutationFn: (formData: AddCategoryFormType) => CreateCategory(formData),
 
-    // reset(); // پاک کردن فرم بعد از ارسال موفق
+  onSuccess: async (data) => {
+    if (data.success) {
+      console.log("✅ دسته‌بندی ایجاد شد:", data.category);
+      // console.log("📅 زمان اجرا:", data.meta.executionTimeMs, "ms");
+      alert(data.message);
+
+      await revalidateCategoris();
+      reset();
+    } else {
+      alert("❌ خطا: " + data.message);
+    }
+  },
+
+  onError: (err) => {
+    console.error("❌ خطا در ایجاد دسته بندی:", err);
+  },
+});
+
+  // تابع ارسال فرم
+  const onSubmit = (data: AddCategoryFormType) => {
+    console.log("🟢 Form Submitted", data);
+    const formattedData = {
+      ...data,
+      
+      // availableFrom: new Date(`${data.availableFrom}T00:00:00Z`).toISOString(),
+    };
+    createMutation.mutate(formattedData);
   };
 
-
-   return (
+  return (
     <form
       onSubmit={handleSubmit(onSubmit)}
       className="max-w-md mx-auto p-4 bg-white shadow rounded-2xl flex flex-col gap-4"
@@ -54,9 +94,7 @@ function CategoryCreateForm() {
           placeholder="مثلاً id دسته والد"
         />
         {errors.parentId && (
-          <p className="text-red-500 text-sm mt-1">
-            {errors.parentId.message}
-          </p>
+          <p className="text-red-500 text-sm mt-1">{errors.parentId.message}</p>
         )}
       </div>
 
@@ -135,7 +173,5 @@ function CategoryCreateForm() {
     </form>
   );
 }
-
-
 
 export default CategoryCreateForm;

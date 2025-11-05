@@ -1,7 +1,7 @@
 export interface AddCategoryRequest {
-  parentId: string;
+  parentId?: string;
   name: string;
   slug: string;
   description: string;
-  icon: string;
+  icon?: string;
 }

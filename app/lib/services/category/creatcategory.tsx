@@ -1,14 +1,51 @@
-import { AddCategoryRequest } from "@/app/type/category/categorytype";
+// import { AddCategoryRequest } from "@/app/type/category/categorytype";
+// import axiosInstance from "../axiosInstance/axiosInstance";
+
+// const CreateCategory = async (categoryData:AddCategoryRequest) => {
+//   try {
+//     const response = await axiosInstance.post("Category/Add", categoryData);
+
+//     return {success: true, data: response.data};
+//   } catch(error) {
+//     console.error("خطایی رخ داده است!",error);
+//     return { success: false, error: "خطا در ایجاد دسته‌بندی" };
+//   }
+// };
+// export default CreateCategory;
+
+
+import { ApiResponse } from "@/app/type/apiResponse";
 import axiosInstance from "../axiosInstance/axiosInstance";
+import { AddCategoryRequest } from "@/app/type/category/categorytype";
 
-const CreateCategory = async (categoryData:AddCategoryRequest) => {
+
+
+const CreateCategory = async (categoryData: AddCategoryRequest) => {
   try {
-    const response = await axiosInstance.post("Category/Add", categoryData);
+    // مشخص کردن نوع پاسخ (ApiResponse<Category>)
+    const response = await axiosInstance.post<ApiResponse<AddCategoryRequest>>(
+      "Category/Add",
+      categoryData
+    );
 
-    return {success: true, data: response.data};
-  } catch(error) {
-    console.error("خطایی رخ داده اس!",error);
-    return { success: false, error: "خطا در ایجاد دسته‌بندی" };
+    const apiResponse = response.data;
+
+    return {
+      success: apiResponse.success,
+      message: apiResponse.message,
+      category: apiResponse.data.result,
+      meta: apiResponse.meta,
+    };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("❌ خطا در ایجاد دسته‌بندی:", error.response?.data || error.message);
+
+    return {
+      success: false,
+      message: error.response?.data?.message || "خطای ناشناخته در ایجاد دسته‌بندی",
+      error: error.response?.data,
+    };
   }
 };
+
 export default CreateCategory;
