@@ -6,10 +6,12 @@ import {
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import CreateCategory from "@/app/lib/services/category/creatcategory";
 import { revalidateCategoris } from "@/app/lib/actions/revalidate-category";
 import { useRouter } from "next/navigation";
+import { GetCategoryTree } from "@/app/lib/services/category/getCategoryTree";
+import TreeDropdown from "@/app/components/category/TreeDropdown";
 
 function CategoryCreateForm() {
   const router = useRouter();
@@ -17,6 +19,8 @@ function CategoryCreateForm() {
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<AddCategoryFormType>({
     resolver: zodResolver(AddCategoryRequestSchema),
@@ -41,6 +45,10 @@ function CategoryCreateForm() {
   //     console.log("❌ خطا در ایجاد دسته بندی: " + err.message);
   //   },
   // });
+  const { data: categoryTree, isLoading } = useQuery({
+  queryKey: ["category-tree"],
+  queryFn: GetCategoryTree,
+});
 const createMutation = useMutation({
   mutationFn: (formData: AddCategoryFormType) => CreateCategory(formData),
 
@@ -76,27 +84,32 @@ const createMutation = useMutation({
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="max-w-md mx-auto p-4 bg-white shadow rounded-2xl flex flex-col gap-4"
+      className=" max-w-4xl mx-auto p-5 bg-white shadow rounded-2xl flex flex-col gap-4 mt-20"
     >
       <h2 className="text-lg font-semibold text-gray-700 mb-2">
         ایجاد دسته‌بندی جدید
       </h2>
 
-      {/* parentId */}
-      <div>
-        <label className="block text-sm font-medium text-gray-600 mb-1">
-          شناسه والد (اختیاری)
-        </label>
-        <input
-          type="text"
-          {...register("parentId")}
-          className="w-full border rounded-lg p-2 focus:ring focus:ring-blue-200"
-          placeholder="مثلاً id دسته والد"
-        />
-        {errors.parentId && (
-          <p className="text-red-500 text-sm mt-1">{errors.parentId.message}</p>
-        )}
-      </div>
+<div>
+  <label className="block text-sm font-medium text-gray-600 mb-1">
+    دسته بندی 
+  </label>
+
+  {isLoading ? (
+    <p className="text-gray-500 text-sm">در حال بارگذاری...</p>
+  ) : (
+    <TreeDropdown
+      items={categoryTree || []}
+      selectedId={watch("parentId") || null}
+      onSelect={(value) => setValue("parentId", value || undefined)}
+    />
+  )}
+
+  {errors.parentId && (
+    <p className="text-red-500 text-sm mt-1">{errors.parentId.message}</p>
+  )}
+</div>
+
 
       {/* name */}
       <div>
@@ -166,7 +179,7 @@ const createMutation = useMutation({
       <button
         type="submit"
         disabled={isSubmitting}
-        className="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg disabled:opacity-50"
+        className="mt-4 bg-sky-900 hover:bg-sky-700 text-white py-2 px-4 rounded-lg disabled:opacity-50"
       >
         {isSubmitting ? "در حال ارسال..." : "ثبت دسته‌بندی"}
       </button>

@@ -5,3 +5,11 @@ export interface AddCategoryRequest {
   description: string;
   icon?: string;
 }
+
+export interface CategoryTreeNode {
+  id: string;
+  name: string;
+  slug: string;
+  parentId?: string | null;
+  children?: CategoryTreeNode[];
+}
