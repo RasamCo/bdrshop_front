@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import {
   AddCategoryFormType,
@@ -12,72 +13,75 @@ import { revalidateCategoris } from "@/app/lib/actions/revalidate-category";
 import { useRouter } from "next/navigation";
 import { GetCategoryTree } from "@/app/lib/services/category/getCategoryTree";
 import TreeDropdown from "@/app/components/category/TreeDropdown";
+import { toast } from "react-toastify";
 
 function CategoryCreateForm() {
   const router = useRouter();
+
+  // 1) defaultValues: parentId = null
   const {
     register,
     handleSubmit,
     reset,
     watch,
     setValue,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<AddCategoryFormType>({
     resolver: zodResolver(AddCategoryRequestSchema),
+    defaultValues: {
+      parentId: null, // مهم: بصورت صریح null
+      name: "",
+      slug: "",
+      description: "",
+      icon: undefined,
+    },
   });
 
-  // const createMutation = useMutation({
-  //   mutationFn: (formData: AddCategoryFormType) => CreateCategory(formData),
-  //   onSuccess: async (data) => {
-  //     console.log(data);
-
-  //     console.log("Created Category:", data);
-  //     await revalidateCategoris(); // بروزرسانی سمت سرور
-  //     reset(); // ریست فرم بعد از ساخت موفق
-  //     // toast.dark("  خانه جدید اضافه شد🎉", {
-  //     //   style: { background: "#1E1E1E", color: "#fff" },
-  //     // });
-  //     // setTimeout(() => {
-  //     //   //router.push("/");
-  //     // }, 3000);
-  //   },
-  //   onError: (err) => {
-  //     console.log("❌ خطا در ایجاد دسته بندی: " + err.message);
-  //   },
-  // });
   const { data: categoryTree, isLoading } = useQuery({
-  queryKey: ["category-tree"],
-  queryFn: GetCategoryTree,
-});
-const createMutation = useMutation({
-  mutationFn: (formData: AddCategoryFormType) => CreateCategory(formData),
+    queryKey: ["category-tree"],
+    queryFn: GetCategoryTree,
+  });
 
-  onSuccess: async (data) => {
-    if (data.success) {
-      console.log("✅ دسته‌بندی ایجاد شد:", data.category);
-      // console.log("📅 زمان اجرا:", data.meta.executionTimeMs, "ms");
-      alert(data.message);
+  const createMutation = useMutation({
+    mutationFn: (formData: AddCategoryFormType) => CreateCategory(formData),
 
-      await revalidateCategoris();
-      reset();
-    } else {
-      alert("❌ خطا: " + data.message);
-    }
-  },
+    onSuccess: async (data) => {
+      if (data.success) {
+        toast.success("✅ " + data.message);
+        console.log(data)
+        await revalidateCategoris();
+        reset();
+      } else {
+        toast.error(data.message);
+         console.log(data)
+      }
+    },
 
-  onError: (err) => {
-    console.error("❌ خطا در ایجاد دسته بندی:", err);
-  },
-});
+    onError: (err: any) => {
+      toast.error("❌ خطا در ایجاد دسته بندی: " + (err?.message || err));
+    },
+  });
 
   // تابع ارسال فرم
   const onSubmit = (data: AddCategoryFormType) => {
-    console.log("🟢 Form Submitted", data);
+    // 2) تبدیل صریح parentId به null در صورت undefined / empty string
+    let parentIdNormalized: string | null | undefined = data.parentId as any;
+
+    // اگر مقدار empty string یا "undefined" یا 0 اون رو null کن
+    if (parentIdNormalized === undefined || parentIdNormalized === "" ) {
+      parentIdNormalized = null;
+    }
+
     const formattedData = {
       ...data,
-      
-      // availableFrom: new Date(`${data.availableFrom}T00:00:00Z`).toISOString(),
+      parentId: parentIdNormalized, // حالا یا string یا null (هرگز undefined)
     };
+
+    // لاگ payload برای دیباگ (قبل از mutate)
+    console.log("Payload to send:", formattedData);
+
+    // 3) ارسال
     createMutation.mutate(formattedData);
   };
 
@@ -90,26 +94,33 @@ const createMutation = useMutation({
         ایجاد دسته‌بندی جدید
       </h2>
 
-<div>
-  <label className="block text-sm font-medium text-gray-600 mb-1">
-    دسته بندی 
-  </label>
+      <div>
+        <label className="block text-sm font-medium text-gray-600 mb-1">
+          دسته بندی
+        </label>
 
-  {isLoading ? (
-    <p className="text-gray-500 text-sm">در حال بارگذاری...</p>
-  ) : (
-    <TreeDropdown
-      items={categoryTree || []}
-      selectedId={watch("parentId") || null}
-      onSelect={(value) => setValue("parentId", value || undefined)}
-    />
-  )}
+        {isLoading ? (
+          <p className="text-gray-500 text-sm">در حال بارگذاری...</p>
+        ) : (
+          <TreeDropdown
+            items={categoryTree || []}
+            selectedId={watch("parentId") ?? null}
+            onSelect={(value) => {
+              // همیشه صریحاً null یا string ست کن
+              if (value === undefined || value === "" ) {
+                setValue("parentId", null, { shouldDirty: true, shouldValidate: true });
+              } else {
+                setValue("parentId", value, { shouldDirty: true, shouldValidate: true });
+              }
+            }}
+            // اگر TreeDropdown از شما propsی نیاز داره (مثل placeholder) اضافه کن
+          />
+        )}
 
-  {errors.parentId && (
-    <p className="text-red-500 text-sm mt-1">{errors.parentId.message}</p>
-  )}
-</div>
-
+        {errors.parentId && (
+          <p className="text-red-500 text-sm mt-1">{errors.parentId.message}</p>
+        )}
+      </div>
 
       {/* name */}
       <div>
@@ -152,7 +163,7 @@ const createMutation = useMutation({
           {...register("description")}
           className="w-full border rounded-lg p-2 focus:ring focus:ring-blue-200"
           placeholder="توضیح کوتاه درباره دسته‌بندی"
-        ></textarea>
+        />
         {errors.description && (
           <p className="text-red-500 text-sm mt-1">
             {errors.description.message}

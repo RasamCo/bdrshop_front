@@ -1,7 +1,7 @@
 import z from "zod";
 
 export const AddCategoryRequestSchema = z.object({
-  parentId: z.string().optional(),
+  parentId: z.string().nullable().optional(),
   name: z.string().min(1, "نام دسته بندی را وارد کنید."),
   slug: z.string().min(1, " را وارد کنید slug. "),
  description: z.string().min(1, "توضیحات الزامی است."),
