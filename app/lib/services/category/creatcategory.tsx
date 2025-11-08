@@ -1,33 +1,41 @@
-
-
-import { ApiResponse } from "@/app/type/apiResponse";
-import axiosInstance from "../axiosInstance/axiosInstance";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AddCategoryRequest } from "@/app/type/category/categorytype";
+import axiosInstance from "../axiosInstance/axiosInstance";
 
-const CreateCategory = async (categoryData: AddCategoryRequest) => {
+interface CreateCategoryResult {
+  success: boolean;
+  message: string;
+  categoryId?: string;
+  error?: any;
+}
+
+const CreateCategory = async (categoryData: AddCategoryRequest): Promise<CreateCategoryResult> => {
   try {
-    // مشخص کردن نوع پاسخ (ApiResponse<Category>)
-    const response = await axiosInstance.post<ApiResponse<AddCategoryRequest>>(
-      "Category/Add",
-      categoryData
-    );
-
-    const apiResponse = response.data;
+    // موفقیت: API فقط یک ID رشته‌ای می‌دهد
+    const response = await axiosInstance.post<string>("Category/Add", categoryData);
+    const id = response.data;
 
     return {
-      success: apiResponse.success,
-      message: apiResponse.message,
-      category: apiResponse.data.result,
-      meta: apiResponse.meta,
+      success: true,
+      message: "دسته‌بندی با موفقیت ایجاد شد",
+      categoryId: id,
     };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    console.error("❌ خطا در ایجاد دسته‌بندی:", error.response?.data || error.message);
+    const problemDetails = error.response?.data;
+
+    if (problemDetails?.extensions?.errors) {
+      // ولیدیشن: پیام‌های تک‌تک را برگردان
+      return {
+        success: false,
+        message: "خطای اعتبار سنجی",
+        error: problemDetails.extensions.errors,
+      };
+    }
 
     return {
       success: false,
-      message: error.response?.data?.message || "خطای ناشناخته در ایجاد دسته‌بندی",
-      error: error.response?.data,
+      message: problemDetails?.title || error.message || "خطای ناشناخته در ایجاد دسته‌بندی",
+      error: problemDetails,
     };
   }
 };

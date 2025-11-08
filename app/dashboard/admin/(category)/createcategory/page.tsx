@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+
 import {
   AddCategoryFormType,
   AddCategoryRequestSchema,
@@ -18,19 +19,17 @@ import { toast } from "react-toastify";
 function CategoryCreateForm() {
   const router = useRouter();
 
-  // 1) defaultValues: parentId = null
   const {
     register,
     handleSubmit,
     reset,
     watch,
     setValue,
-    getValues,
     formState: { errors, isSubmitting },
   } = useForm<AddCategoryFormType>({
     resolver: zodResolver(AddCategoryRequestSchema),
     defaultValues: {
-      parentId: null, // مهم: بصورت صریح null
+      parentId: null,
       name: "",
       slug: "",
       description: "",
@@ -45,50 +44,48 @@ function CategoryCreateForm() {
 
   const createMutation = useMutation({
     mutationFn: (formData: AddCategoryFormType) => CreateCategory(formData),
-
     onSuccess: async (data) => {
       if (data.success) {
-        toast.success("✅ " + data.message);
-        console.log(data)
+        toast.success("✅ دسته‌بندی با موفقیت ایجاد شد");
         await revalidateCategoris();
         reset();
-      } else {
-        toast.error(data.message);
-         console.log(data)
       }
     },
-
     onError: (err: any) => {
-      toast.error("❌ خطا در ایجاد دسته بندی: " + (err?.message || err));
+      // بررسی دقیق خطاهای ولیدیشن سرور
+      const serverErrors = err.response?.data?.errors;
+      if (serverErrors && typeof serverErrors === "object") {
+        Object.entries(serverErrors).forEach(([field, messages]) => {
+          if (Array.isArray(messages)) {
+            messages.forEach((msg) => toast.error(`${field}: ${msg}`));
+          } else if (typeof messages === "string") {
+            toast.error(`${field}: ${messages}`);
+          }
+        });
+      } else {
+        // fallback: خطاهای عمومی یا ناشناخته
+        const message = err.response?.data?.title || err.response?.data?.detail || err.message || "خطای ناشناخته در ایجاد دسته‌بندی";
+        toast.error(message);
+      }
     },
   });
 
-  // تابع ارسال فرم
   const onSubmit = (data: AddCategoryFormType) => {
-    // 2) تبدیل صریح parentId به null در صورت undefined / empty string
-    let parentIdNormalized: string | null | undefined = data.parentId as any;
-
-    // اگر مقدار empty string یا "undefined" یا 0 اون رو null کن
-    if (parentIdNormalized === undefined || parentIdNormalized === "" ) {
-      parentIdNormalized = null;
-    }
+    // تبدیل parentId به null اگر خالی باشد
+    const parentIdNormalized = data.parentId === undefined || data.parentId === "" ? null : data.parentId;
 
     const formattedData = {
       ...data,
-      parentId: parentIdNormalized, // حالا یا string یا null (هرگز undefined)
+      parentId: parentIdNormalized,
     };
 
-    // لاگ payload برای دیباگ (قبل از mutate)
-    console.log("Payload to send:", formattedData);
-
-    // 3) ارسال
     createMutation.mutate(formattedData);
   };
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className=" max-w-4xl mx-auto p-5 bg-white shadow rounded-2xl flex flex-col gap-4 mt-20"
+      className="max-w-4xl mx-auto p-5 bg-white shadow rounded-2xl flex flex-col gap-4 mt-20"
     >
       <h2 className="text-lg font-semibold text-gray-700 mb-2">
         ایجاد دسته‌بندی جدید
@@ -98,7 +95,6 @@ function CategoryCreateForm() {
         <label className="block text-sm font-medium text-gray-600 mb-1">
           دسته بندی
         </label>
-
         {isLoading ? (
           <p className="text-gray-500 text-sm">در حال بارگذاری...</p>
         ) : (
@@ -106,23 +102,19 @@ function CategoryCreateForm() {
             items={categoryTree || []}
             selectedId={watch("parentId") ?? null}
             onSelect={(value) => {
-              // همیشه صریحاً null یا string ست کن
-              if (value === undefined || value === "" ) {
-                setValue("parentId", null, { shouldDirty: true, shouldValidate: true });
-              } else {
-                setValue("parentId", value, { shouldDirty: true, shouldValidate: true });
-              }
+              setValue("parentId", value === "" || value === undefined ? null : value, {
+                shouldDirty: true,
+                shouldValidate: true,
+              });
             }}
-            // اگر TreeDropdown از شما propsی نیاز داره (مثل placeholder) اضافه کن
           />
         )}
-
         {errors.parentId && (
           <p className="text-red-500 text-sm mt-1">{errors.parentId.message}</p>
         )}
       </div>
 
-      {/* name */}
+      {/* نام دسته‌بندی */}
       <div>
         <label className="block text-sm font-medium text-gray-600 mb-1">
           نام دسته‌بندی
@@ -154,7 +146,7 @@ function CategoryCreateForm() {
         )}
       </div>
 
-      {/* description */}
+      {/* توضیحات */}
       <div>
         <label className="block text-sm font-medium text-gray-600 mb-1">
           توضیحات
@@ -165,13 +157,11 @@ function CategoryCreateForm() {
           placeholder="توضیح کوتاه درباره دسته‌بندی"
         />
         {errors.description && (
-          <p className="text-red-500 text-sm mt-1">
-            {errors.description.message}
-          </p>
+          <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>
         )}
       </div>
 
-      {/* icon */}
+      {/* آیکون */}
       <div>
         <label className="block text-sm font-medium text-gray-600 mb-1">
           آیکون (اختیاری)
@@ -180,7 +170,7 @@ function CategoryCreateForm() {
           type="text"
           {...register("icon")}
           className="w-full border rounded-lg p-2 focus:ring focus:ring-blue-200"
-          placeholder=" 🛍️"
+          placeholder="🛍️"
         />
         {errors.icon && (
           <p className="text-red-500 text-sm mt-1">{errors.icon.message}</p>
