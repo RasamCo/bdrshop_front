@@ -2,7 +2,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 const axiosInstance = axios.create({
-  baseURL: "https://localhost:7005/api/",
+  // baseURL: "https://localhost:7005/api/",
+   baseURL: "http://localhost:5296/api/",
   withCredentials: false, // اگر نیازی به ارسال کوکی‌ها نداری، false بمونه
   validateStatus: (status) => status >= 200 && status < 300, // فقط پاسخ‌های 2xx موفق هستن
 });
