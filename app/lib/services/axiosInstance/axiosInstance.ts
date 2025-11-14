@@ -10,11 +10,16 @@ const axiosInstance = axios.create({
 
 // 🎯 مدیریت پاسخ‌ها و خطاها
 axiosInstance.interceptors.response.use(
+  
   (response) => response, // اگر پاسخ موفق بود، همون رو برگردون
+
   (error) => {
+   
     //اگر خطا داشتیم
     const status = error.response?.status;
     const problemDetails = error.response?.data;
+    console.log(status)
+    console.log(problemDetails)
 
     // 📡 اگر پاسخ از سرور نداشتیم (مثلاً اینترنت قطع شده)
     if (!status) {

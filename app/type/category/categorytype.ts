@@ -12,4 +12,7 @@ export interface CategoryTreeNode {
   slug: string;
   parentId?: string | null;
   children?: CategoryTreeNode[];
+  IsActive:boolean;
+  DisplayOrder:Int16Array;
+
 }
