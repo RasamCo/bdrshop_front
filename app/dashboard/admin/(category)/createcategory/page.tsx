@@ -8,7 +8,7 @@ import {
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import CreateCategory from "@/app/lib/services/category/creatcategory";
 import { revalidateCategoris } from "@/app/lib/actions/revalidate-category";
 import { useRouter } from "next/navigation";
@@ -37,18 +37,19 @@ function CategoryCreateForm() {
     },
   });
 
-  const { data: categoryTree, isLoading } = useQuery({
+  const { data: categoryTree, isLoading, refetch } = useQuery({
     queryKey: ["category-tree"],
     queryFn: GetCategoryTree,
   });
-
+  const queryClient = useQueryClient();
   const createMutation = useMutation({
     mutationFn: (formData: AddCategoryFormType) => CreateCategory(formData),
     onSuccess: async (data) => {
       if (data.success) {
         toast.success("✅ دسته‌بندی با موفقیت ایجاد شد");
-        await revalidateCategoris();
-        reset();
+        queryClient.invalidateQueries({ queryKey: ["category-tree"] });
+        reset(); // فرم را ریست کن
+        // await revalidateCategoris();
       }
     },
     onError: (err: any) => {
@@ -77,9 +78,30 @@ function CategoryCreateForm() {
     const formattedData = {
       ...data,
       parentId: parentIdNormalized,
+      icon: data.icon,
     };
 
     createMutation.mutate(formattedData);
+  };
+  const MAX_SIZE = 50 * 1024; // حداکثر 50KB برای آیکون
+  const handleIconChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > MAX_SIZE) {
+      toast.error("❌ اندازه آیکون باید کمتر از 50KB باشد");
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      toast.error("❌ فقط فایل‌های تصویری مجاز هستند");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result as string; // رشته Base64
+      setValue("icon", base64String); // react-hook-form
+    };
+    reader.readAsDataURL(file); // تبدیل فایل به Base64
   };
 
   return (
@@ -166,12 +188,20 @@ function CategoryCreateForm() {
         <label className="block text-sm font-medium text-gray-600 mb-1">
           آیکون (اختیاری)
         </label>
-        <input
+
+        <input type="file"
+          accept="image/"
+          {...register("icon")}
+          onChange={handleIconChange}
+          multiple={false}//فقظ یک فایل انتخاب شود
+          className="w-full border rounded-lg p-2 focus:ring focus:ring-blue-200"
+        />
+        {/* <input
           type="text"
           {...register("icon")}
           className="w-full border rounded-lg p-2 focus:ring focus:ring-blue-200"
           placeholder="🛍️"
-        />
+        /> */}
         {errors.icon && (
           <p className="text-red-500 text-sm mt-1">{errors.icon.message}</p>
         )}
