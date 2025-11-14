@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@tailwind utilities;
 
 :root {
   --background: #ffffff;
@@ -23,4 +24,103 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* font-faces */
+@font-face {
+  font-family: 'lahze-t';
+  src: url('/fonts/lahze/Lahzeh-Thin.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'lahze-el';
+  src: url('/fonts/lahze/Lahzeh-ExtraLight.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'lahze-l';
+  src: url('/fonts/lahze/Lahzeh-Light.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'lahze-m';
+  src: url('/fonts/lahze/Lahzeh-Medium.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'lahze-sb';
+  src: url('/fonts/lahze/Lahzeh-SemiBold.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'lahze-b';
+  src: url('/fonts/lahze/Lahzeh-Bold.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'lahze-eb';
+  src: url('/fonts/lahze/Lahzeh-ExtraBold.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'lahze-B';
+  src: url('/fonts/lahze/Lahzeh-Black.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'market-r';
+  src: url('/fonts/market/market Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+@theme {
+  /* /fonts */
+  --font-font-lahze-thin: 'lahze-t';
+  --font-font-lahze-extralight: 'lahze-el';
+  --font-font-lahze-light: 'lahze-l';
+  --font-font-lahze-medium: 'lahze-m';
+  --font-font-lahze-semibold: 'lahze-sb';
+  --font-font-lahze-bold: 'lahze-b';
+  --font-font-lahze-extrabold: 'lahze-eb';
+  --font-font-lahze-black: 'lahze-B';
+  --font-font-market-regular: 'market-r';
+
+  /* colors */
+  --color-text-main: #1E1E1E;
+  --color-bg-background: #f5f5f5;
+  --color-orginal-color: #005ABA;
+  --color-orginal-color-support: #034994;
+  --color-shadow-main: #7090B0;
+  --color-bg-forground: #ededed;
+  --color-box: #536579;
+  --color-border: #fafafa;
+  --color-alarm-notification: #E42525;
+  --color-starpoint-color: #FEC514;
+  --color-bg-oldbox-color: #102238;
+  --color-commentication: #F37D32;
+  --color-little-shadow: #C7C7C7;
+  --color-limit-auth: #0089BF;
+  --color-text-legend-input: #5D5D5D;
+  --color-bg1-auth: #446F9D;
+  --color-bg2-auth: #C2C6CC;
+  --color-bg-cart-auth: #E2E2E2;
+
 }
