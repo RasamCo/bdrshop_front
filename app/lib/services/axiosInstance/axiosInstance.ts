@@ -18,9 +18,6 @@ axiosInstance.interceptors.response.use(
     //اگر خطا داشتیم
     const status = error.response?.status;
     const problemDetails = error.response?.data;
-    console.log(status)
-    console.log(problemDetails)
-
     // 📡 اگر پاسخ از سرور نداشتیم (مثلاً اینترنت قطع شده)
     if (!status) {
       toast.error(
