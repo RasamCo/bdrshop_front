@@ -46,8 +46,8 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
                     "flex flex-col gap-2">
                     <h1
                         className=
-                        "text-lg font-extrabold">
-                        مدیریت فروشگاه
+                        "text-2xl font-extrabold">
+                        bdrshop
                     </h1>
                     <p
                         className=
@@ -67,7 +67,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
                 "p-4 text-right space-y-3 overflow-y-auto h-[calc(100%-76px)]">
                 <a
                     className=
-                    "block p-2 rounded-lg hover:bg-gray-50 transition">
+                    "block p-2 rounded-lg hover:bg-orginal-color/10 transition">
                     داشبورد
                 </a>
                 {(["products", "orders", "customers", "settings", "structure"] as MenuKey[]).map(
@@ -77,7 +77,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
                             <button
                                 onClick={() => toggle(key)}
                                 className=
-                                "w-full flex justify-between items-center p-2 rounded-lg hover:bg-gray-50 transition">
+                                "w-full flex justify-between items-center p-2 rounded-lg hover:bg-orginal-color/10 transition">
                                 <span
                                     className=
                                     "flex items-center gap-2">
@@ -104,7 +104,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
                                             <a
                                                 key={item}
                                                 className=
-                                                "block p-2 rounded hover:bg-gray-50">
+                                                "block p-2 rounded hover:bg-orginal-color/10">
                                                 {item}
                                             </a>
                                         ))}
@@ -113,7 +113,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
                                             <a
                                                 key={item}
                                                 className=
-                                                "block p-2 rounded hover:bg-gray-50">
+                                                "block p-2 rounded hover:bg-orginal-color/10">
                                                 {item}
                                             </a>
                                         ))}
@@ -122,7 +122,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
                                             <a
                                                 key={item}
                                                 className=
-                                                "block p-2 rounded hover:bg-gray-50">
+                                                "block p-2 rounded hover:bg-orginal-color/10">
                                                 {item}
                                             </a>
                                         ))}
@@ -131,7 +131,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
                                             <a
                                                 key={item}
                                                 className=
-                                                "block p-2 rounded hover:bg-gray-50">
+                                                "block p-2 rounded hover:bg-orginal-color/10">
                                                 {item}
                                             </a>
                                         ))}
@@ -140,7 +140,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
                                             <a
                                                 key={item}
                                                 className=
-                                                "block p-2 rounded hover:bg-gray-50">
+                                                "block p-2 rounded hover:bg-orginal-color/10">
                                                 {item}
                                             </a>
                                         ))}

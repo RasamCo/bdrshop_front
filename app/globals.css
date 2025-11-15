@@ -105,22 +105,60 @@ body {
 
   /* colors */
   --color-text-main: #1E1E1E;
+
+  --color-bg-forground: #ededed;
   --color-bg-background: #f5f5f5;
+
   --color-orginal-color: #005ABA;
   --color-orginal-color-support: #034994;
+
+  --color-little-shadow: #C7C7C7;
   --color-shadow-main: #7090B0;
-  --color-bg-forground: #ededed;
+
   --color-box: #536579;
   --color-border: #fafafa;
+
   --color-alarm-notification: #E42525;
   --color-starpoint-color: #FEC514;
+
   --color-bg-oldbox-color: #102238;
   --color-commentication: #F37D32;
-  --color-little-shadow: #C7C7C7;
+
+
   --color-limit-auth: #0089BF;
   --color-text-legend-input: #5D5D5D;
+
   --color-bg1-auth: #446F9D;
   --color-bg2-auth: #C2C6CC;
   --color-bg-cart-auth: #E2E2E2;
 
+/* UI Status Colors */
+  --color-warning-light: #FEF3C7;
+  --color-warning-base: #FBBF24;
+  --color-warning-dark: #B45309;
+
+  --color-primary-light: #DBEAFE;
+  --color-primary-base: #3B82F6;
+  --color-primary-dark: #1E40AF;
+
+  --color-sale-light: #FEE2E2;
+  --color-sale-base: #EF4444;
+  --color-sale-dark: #991B1B;
+
+  --color-logout-light: #F3F4F6;
+  --color-logout-base: #6B7280;
+  --color-logout-dark: #374151;
+
+  --color-success-light: #D1FAE5;
+  --color-success-base: #10B981;
+  --color-success-dark: #065F46;
+
+  --color-pending-light: #FFFBEB;
+  --color-pending-base: #F59E0B;
+  --color-pending-dark: #92400E;
+
+  /* User Role Colors */
+  --color-role-admin: #6366F1;
+  --color-role-buyer: #14B8A6;
+  --color-role-seller: #EC4899;
 }
