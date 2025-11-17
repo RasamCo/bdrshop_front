@@ -42,3 +42,14 @@ export interface CategoryResultById {
 }
 
 
+export interface UpdateCategoryRequest {
+  id:string;
+  parentId?: string | null;
+  name: string;
+  slug: string;
+  description: string;
+  icon?: string;
+  isactive:boolean;
+}
+
+
