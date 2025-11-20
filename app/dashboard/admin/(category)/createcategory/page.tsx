@@ -37,7 +37,11 @@ function CategoryCreateForm() {
     },
   });
 
-  const { data: categoryTree, isLoading, refetch } = useQuery({
+  const {
+    data: categoryTree,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["category-tree"],
     queryFn: GetCategoryTree,
   });
@@ -65,7 +69,11 @@ function CategoryCreateForm() {
         });
       } else {
         // fallback: خطاهای عمومی یا ناشناخته
-        const message = err.response?.data?.title || err.response?.data?.detail || err.message || "خطای ناشناخته در ایجاد دسته‌بندی";
+        const message =
+          err.response?.data?.title ||
+          err.response?.data?.detail ||
+          err.message ||
+          "خطای ناشناخته در ایجاد دسته‌بندی";
         toast.error(message);
       }
     },
@@ -73,7 +81,10 @@ function CategoryCreateForm() {
 
   const onSubmit = (data: AddCategoryFormType) => {
     // تبدیل parentId به null اگر خالی باشد
-    const parentIdNormalized = data.parentId === undefined || data.parentId === "" ? null : data.parentId;
+    const parentIdNormalized =
+      data.parentId === undefined || data.parentId === ""
+        ? null
+        : data.parentId;
 
     const formattedData = {
       ...data,
@@ -83,27 +94,33 @@ function CategoryCreateForm() {
 
     createMutation.mutate(formattedData);
   };
-  const MAX_SIZE = 50 * 1024; // حداکثر 50KB برای آیکون
+  const MAX_SIZE = 60 * 1024; // حداکثر 50KB برای آیکون
   const handleIconChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    // Clear input بعد هر خطا برای UX بهتر
+    const clearInput = () => {
+      e.target.value = "";
+    };
     if (file.size > MAX_SIZE) {
       toast.error("❌ اندازه آیکون باید کمتر از 50KB باشد");
+      clearInput();
       return;
     }
     if (!file.type.startsWith("image/")) {
       toast.error("❌ فقط فایل‌های تصویری مجاز هستند");
+      clearInput();
       return;
     }
 
     const reader = new FileReader();
     reader.onloadend = () => {
-      const base64String = reader.result as string; // رشته Base64
+      const base64String = reader.result as string; // رشته Base64         برای تبدیل فایل باینری به رشته متنی (Base64) استفاده می‌شه.
       setValue("icon", base64String); // react-hook-form
     };
     reader.readAsDataURL(file); // تبدیل فایل به Base64
   };
-
+const iconValue = watch("icon");
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -124,10 +141,14 @@ function CategoryCreateForm() {
             items={categoryTree || []}
             selectedId={watch("parentId") ?? null}
             onSelect={(value) => {
-              setValue("parentId", value === "" || value === undefined ? null : value, {
-                shouldDirty: true,
-                shouldValidate: true,
-              });
+              setValue(
+                "parentId",
+                value === "" || value === undefined ? null : value,
+                {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                }
+              );
             }}
           />
         )}
@@ -179,7 +200,9 @@ function CategoryCreateForm() {
           placeholder="توضیح کوتاه درباره دسته‌بندی"
         />
         {errors.description && (
-          <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>
+          <p className="text-red-500 text-sm mt-1">
+            {errors.description.message}
+          </p>
         )}
       </div>
 
@@ -189,19 +212,24 @@ function CategoryCreateForm() {
           آیکون (اختیاری)
         </label>
 
-        <input type="file"
+        <input
+          type="file"
           accept="image/"
           {...register("icon")}
           onChange={handleIconChange}
-          multiple={false}//فقظ یک فایل انتخاب شود
+          multiple={false} //فقظ یک فایل انتخاب شود
           className="w-full border rounded-lg p-2 focus:ring focus:ring-blue-200"
         />
-        {/* <input
-          type="text"
-          {...register("icon")}
-          className="w-full border rounded-lg p-2 focus:ring focus:ring-blue-200"
-          placeholder="🛍️"
-        /> */}
+        {/* Preview آیکون */}
+        { iconValue && iconValue.length > 0 &&(
+          <div className="mt-2">
+            <img
+              src={watch("icon")}
+              alt="پیش‌نمایش آیکون"
+              className="w-16 h-16 object-cover rounded border"
+            />
+          </div>
+        )}
         {errors.icon && (
           <p className="text-red-500 text-sm mt-1">{errors.icon.message}</p>
         )}
