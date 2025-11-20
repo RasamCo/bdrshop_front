@@ -11,12 +11,12 @@ interface TreeDropdownProps {
   onSelect: (id: string | null, name?: string) => void;
 }
 
-export default function TreeDropdown({ 
-  items, 
-  selectedId, 
+export default function TreeDropdown({
+  items,
+  selectedId,
   initialSelectedName,
   placeholder = "والد را انتخاب کنید",
-  onSelect 
+  onSelect
 }: TreeDropdownProps) {
   const [openNodes, setOpenNodes] = useState<Set<string>>(new Set());
   const [isOpen, setIsOpen] = useState(false);
@@ -35,11 +35,11 @@ export default function TreeDropdown({
 
   // محاسبه نام نمایش‌داده‌شده (با دیباگ)
   const getCurrentSelectedName = (): string => {
-    console.log("🔍 Debug TreeDropdown:", { 
-      selectedId, 
-      itemsLength: items.length, 
-      initialSelectedName, 
-      placeholder 
+    console.log("🔍 Debug TreeDropdown:", {
+      selectedId,
+      itemsLength: items.length,
+      initialSelectedName,
+      placeholder
     }); // ← دیباگ: در کنسول چک کن
 
     if (selectedId === null) {
@@ -86,9 +86,8 @@ export default function TreeDropdown({
       return (
         <div key={node.id} className={`mr-${depth * 3}`}>
           <div
-            className={`flex items-center gap-1 py-1 px-2 rounded cursor-pointer ${
-              selectedId === node.id ? "bg-blue-100 text-blue-800" : "hover:bg-gray-100"
-            }`}
+            className={`flex items-center gap-1 py-1 px-2 rounded cursor-pointer ${selectedId === node.id ? "bg-blue-100 text-blue-800" : "hover:bg-gray-100"
+              }`}
             style={{ marginRight: `${depth * 12}px` }}
           >
             {hasChildren && (
@@ -144,9 +143,8 @@ export default function TreeDropdown({
           {/* گزینه دسته اصلی */}
           <div
             onClick={() => handleSelect(null)}
-            className={`cursor-pointer py-2 px-3 border-b border-gray-100 hover:bg-gray-50 ${
-              selectedId === null ? "bg-blue-100 text-blue-800" : ""
-            }`}
+            className={`cursor-pointer py-2 px-3 border-b border-gray-100 hover:bg-gray-50 ${selectedId === null ? "bg-blue-100 text-blue-800" : ""
+              }`}
           >
             دسته اصلی
           </div>
