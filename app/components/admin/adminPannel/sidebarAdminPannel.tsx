@@ -7,6 +7,7 @@ type MenuKey = "products" | "orders" | "customers" | "settings" | "structure";
 interface SidebarProps {
     open: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    setPage: React.Dispatch<React.SetStateAction<"dashboard" | "add-product">>;
 }
 
 interface MenuState {
@@ -17,7 +18,7 @@ interface MenuState {
     structure: boolean;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
+const Sidebar: React.FC<SidebarProps> = ({ open, setOpen, setPage }) => {
     const [menus, setMenus] = useState<MenuState>({
         products: false,
         orders: false,
@@ -66,6 +67,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
                 className=
                 "p-4 text-right space-y-3 overflow-y-auto h-[calc(100%-76px)]">
                 <a
+                    onClick={() => setPage("dashboard")}
                     className=
                     "block p-2 rounded-lg hover:bg-orginal-color/10 transition">
                     داشبورد
@@ -85,7 +87,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
                                     {key === "orders" && "سفارش‌ها"}
                                     {key === "customers" && "مشتریان"}
                                     {key === "settings" && "تنظیمات"}
-                                    {key === "structure" && "چارت سازمانی"}
+                                    {key === "structure" && "ثبت محصول"}
                                 </span>
                                 <span
                                     className=
@@ -136,8 +138,9 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
                                             </a>
                                         ))}
                                     {key === "structure" &&
-                                        ["مدیریت", "پشتیبانی"].map(item => (
+                                        ["افزودن", "کنترل"].map(item => (
                                             <a
+                                                onClick={() => setPage("add-product")}
                                                 key={item}
                                                 className=
                                                 "block p-2 rounded hover:bg-orginal-color/10">
